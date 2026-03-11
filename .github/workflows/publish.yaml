@@ -89,6 +89,8 @@ jobs:
           pip install build
 
       - name: Build the package (sdist and wheel)
+        env:
+            SETUPTOOLS_SCM_PRETEND_VERSION: ${{ needs.release.outputs.new_tag }}
         run: python -m build
 
       - name: Publish package distributions to PyPI
