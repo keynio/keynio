@@ -1,0 +1,6 @@
+dist
+build
+.pytest_cache
+__pycache__
+keynio.egg-info
+_version.py

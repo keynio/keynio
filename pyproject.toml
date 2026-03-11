@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0", "setuptools_scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "keynio"
+dynamic = ["version"]
+authors = [
+  { name="Andreas Stratakis", email="andrew.stratakis@gmail.com" },
+  { name="Nikolas Bakatselos", email="nibakats@gmail.com" },
+  { name="Dimitris Petrou", email="petroudimitris@outlook.com" },
+]
+description = "A brief description of the keynio library."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    # Add your library's dependencies here, e.g., "requests>=2.25.1"
+]
+
+[project.urls]
+"Homepage" = "https://key-io.eu"
+"Bug Tracker" = "https://github.com/keynio/keynio/issues"
+
+[tool.setuptools_scm]
+write_to = "src/keynio/_version.py"

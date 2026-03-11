@@ -1,0 +1,95 @@
+name: Publish Python Package to PyPI
+
+# Triggers the pipeline when you push or merge to main
+on:
+  push:
+    branches:
+      - main
+jobs:
+  
+  lint-and-test:
+    name: Pylint and Pytest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+          pip install pylint pytest
+
+      - name: Pylint
+        run: pylint src/keynio
+
+      - name: Pytest
+        run: pytest
+
+  release:
+    name: Create Release
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    outputs:
+      new_tag: ${{ steps.tag_version.outputs.new_tag }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: patch
+
+      - name: Create a GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
+
+  build-and-publish:
+    name: Build and publish Python distribution
+    needs: release
+    runs-on: ubuntu-latest
+    
+    environment:
+      name: pypi
+      url: https://pypi.org/p/keynio
+
+    # IMPORTANT: The id-token permission is required for OIDC authentication with PyPI
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build
+
+      - name: Build the package (sdist and wheel)
+        run: python -m build
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
