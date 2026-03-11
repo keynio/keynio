@@ -28,3 +28,6 @@ dependencies = [
 
 [tool.setuptools_scm]
 write_to = "src/keynio/_version.py"
+
+[tool.pylint.MASTER]
+ignore = ["_version.py"]
